@@ -26,7 +26,7 @@ export default function BudgetTable({ items } : { items: BudgetItem[]}) {
                 <TableRow key={index}>
                 <TableCell className="font-medium">{item.title}</TableCell>
                 <TableCell>{item.category}</TableCell>
-                <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
+                <TableCell className="text-right">${item.amount.toFixed(2)}</TableCell>
                 </TableRow>
             );
         })}

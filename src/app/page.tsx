@@ -20,17 +20,17 @@ import { BudgetItem } from "@/types/budget-item";
 const dummyData: BudgetItem[] = [
   {
     title: "Groceries",
-    price: 100,
+    amount: 100,
     category: "Food",
   },
   {
     title: "Gas",
-    price: 50,
+    amount: 50,
     category: "Transportation",
   },
   {
     title: "Rent",
-    price: 1000,
+    amount: 1000,
     category: "Housing",
   },
 ]
