@@ -7,8 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { BudgetItem } from "@/types/budget-item";
 
-export default function BudgetTable({ items }) {
+export default function BudgetTable({ items } : { items: BudgetItem[]}) {
   return (
     <Table>
       <TableCaption>A list of all your current spendings for the given day.</TableCaption>
@@ -20,11 +21,15 @@ export default function BudgetTable({ items }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow>
-          <TableCell className="font-medium">In-N-Out</TableCell>
-          <TableCell>Food</TableCell>
-          <TableCell className="text-right">$11.00</TableCell>
-        </TableRow>
+        {items.map((item, index) => {
+            return (
+                <TableRow key={index}>
+                <TableCell className="font-medium">{item.title}</TableCell>
+                <TableCell>{item.category}</TableCell>
+                <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
+                </TableRow>
+            );
+        })}
       </TableBody>
     </Table>
   );

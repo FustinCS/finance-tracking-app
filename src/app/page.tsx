@@ -15,6 +15,25 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import BudgetTable from "@/components/budget-table";
+import { BudgetItem } from "@/types/budget-item";
+
+const dummyData: BudgetItem[] = [
+  {
+    title: "Groceries",
+    price: 100,
+    category: "Food",
+  },
+  {
+    title: "Gas",
+    price: 50,
+    category: "Transportation",
+  },
+  {
+    title: "Rent",
+    price: 1000,
+    category: "Housing",
+  },
+]
 
 export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -37,7 +56,7 @@ export default function Home() {
           </div>
         </header>
         <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
-         <BudgetTable items={undefined} />
+         <BudgetTable items={dummyData} />
           <div className="flex-none">
             <Calendar
               mode="single"
