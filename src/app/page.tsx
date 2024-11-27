@@ -1,11 +1,10 @@
+"use client";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -13,8 +12,32 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Calendar } from "@/components/ui/calendar";
+import { useState } from "react";
+import BudgetTable from "@/components/budget-table";
+import { BudgetItem } from "@/types/budget-item";
+
+const dummyData: BudgetItem[] = [
+  {
+    title: "Groceries",
+    amount: 100,
+    category: "Food",
+  },
+  {
+    title: "Gas",
+    amount: 50,
+    category: "Transportation",
+  },
+  {
+    title: "Rent",
+    amount: 1000,
+    category: "Housing",
+  },
+]
 
 export default function Home() {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -26,25 +49,23 @@ export default function Home() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbLink href="#">Budget List</BreadcrumbLink>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
+        <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
+         <BudgetTable items={dummyData} />
+          <div className="flex-none">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              toDate={new Date()} // Disables future dates from current date
+              initialFocus
+            />
           </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div>
       </SidebarInset>
     </SidebarProvider>
