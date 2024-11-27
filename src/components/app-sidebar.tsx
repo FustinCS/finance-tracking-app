@@ -2,15 +2,12 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
-  SquareTerminal,
+  ChartColumn,
+  ThumbsUp
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -18,48 +15,26 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import NavHeader from "./nav-header"
 
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "John Doe",
+    email: "johndoe@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
-    {
-      title: "Home",
-      url: "/",
-      icon: SquareTerminal,
-      isActive: true,
-    },
     {
       title: "Statistics",
       url: "/stats",
-      icon: SquareTerminal,
+      icon: ChartColumn,
       isActive: true,
     },
     {
-      title: "Recommendation",
+      title: "Recommendations",
       url: "/recommendations",
-      icon: SquareTerminal,
+      icon: ThumbsUp,
       isActive: true,
     },
   ],
@@ -69,7 +44,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <NavHeader />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
