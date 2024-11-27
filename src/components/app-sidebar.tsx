@@ -52,7 +52,7 @@ const data = {
     },
     {
       title: "Statistics",
-      url: "/statistics",
+      url: "/stats",
       icon: SquareTerminal,
       isActive: true,
     },
