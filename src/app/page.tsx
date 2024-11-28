@@ -16,26 +16,30 @@ import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import BudgetTable from "@/components/budget-table";
 import { BudgetItem } from "@/types/budget-item";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AddDialog } from "@/components/add-dialog";
 
 const dummyData: BudgetItem[] = [
   {
-    title: "Groceries",
+    name: "Groceries",
     amount: 100,
     category: "Food",
   },
   {
-    title: "Gas",
+    name: "Gas",
     amount: 50,
     category: "Transportation",
   },
   {
-    title: "Rent",
-    amount: 1000,
+    name: "Rent",
+    amount: 1000.00,
     category: "Housing",
   },
-]
+];
 
 export default function Home() {
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(dummyData);
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
@@ -48,25 +52,35 @@ export default function Home() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Budget List</BreadcrumbLink>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="#">Home</BreadcrumbLink>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
-         <BudgetTable items={dummyData} />
-          <div className="flex-none">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              toDate={new Date()} // Disables future dates from current date
-              initialFocus
-            />
+        <main className="p-0 lg:p-16 lg:pt-4">
+          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-center lg:text-left">
+            Budget List
+          </h2>
+          <div className="flex flex-col items-center lg:items-start lg:flex-row gap-4">
+            <div className="flex-grow flex flex-col">
+              <div className="self-center lg:self-end pb-2">
+                <AddDialog items={budgetItems} setItems={setBudgetItems} />
+              </div>
+              <BudgetTable items={budgetItems} />
+            </div>
+            <Card className="w-fit">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                toDate={new Date()} // Disables future dates from current date
+                initialFocus
+              />
+            </Card>
           </div>
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

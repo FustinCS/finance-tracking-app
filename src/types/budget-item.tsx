@@ -1,5 +1,5 @@
 export type BudgetItem = {
-    title: string;
+    name: string,
+    category: string,
     amount: number,
-    category: string;
 }
