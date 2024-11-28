@@ -13,34 +13,47 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BudgetTable from "@/components/budget-table";
 import { BudgetItem } from "@/types/budget-item";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { AddDialog } from "@/components/add-dialog";
-
-const dummyData: BudgetItem[] = [
-  {
-    name: "Groceries",
-    amount: 100,
-    category: "Food",
-  },
-  {
-    name: "Gas",
-    amount: 50,
-    category: "Transportation",
-  },
-  {
-    name: "Rent",
-    amount: 1000.00,
-    category: "Housing",
-  },
-];
+import { db } from "@/firebase";
+import { collection, getDocs, query, Timestamp, where } from "firebase/firestore";
 
 export default function Home() {
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(dummyData);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
+  const [date, setDate] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const getBudgetItems = async () => {
+      const startOfDay = new Date(date);
+      const endOfDay = new Date(date);
+
+      startOfDay.setHours(0, 0, 0, 0);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const q = query(
+        collection(db, "spending"),
+        where("date", ">=", startOfDay),
+        where("date", "<=", endOfDay)
+      );
+
+      await getDocs(q).then((querySnapshot) => {
+        const data = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            category: data.category,
+            amount: data.amount,
+          };
+        });
+        setBudgetItems(data);
+      });
+    };
+    getBudgetItems();
+  }, [date])
 
   return (
     <SidebarProvider>
@@ -74,7 +87,7 @@ export default function Home() {
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={setDate}
+                onSelect={(day) => day && setDate(day)}
                 toDate={new Date()} // Disables future dates from current date
                 initialFocus
               />
