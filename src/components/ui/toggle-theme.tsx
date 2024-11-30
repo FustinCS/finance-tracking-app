@@ -12,9 +12,9 @@ export function ToggleTheme() {
   const { theme, setTheme } = useTheme()
 
   return (
-    <DropdownMenuItem 
+    <DropdownMenuItem
       onClick={() => theme === 'light' ? setTheme("dark") : setTheme("light")}
-      className="cursor-pointer"
+      className="cursor-pointer justify-center"
     >
       Toggle Theme
     </DropdownMenuItem>
