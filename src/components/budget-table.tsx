@@ -20,6 +20,7 @@ import { BudgetItem } from "@/types/budget-item";
 import { Button } from "./ui/button";
 
 export default function BudgetTable({ items }: { items: BudgetItem[] }) {
+  
   return (
     <Table>
       <TableHeader>

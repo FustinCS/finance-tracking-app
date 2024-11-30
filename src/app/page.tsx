@@ -20,10 +20,13 @@ import { Card } from "@/components/ui/card";
 import { AddDialog } from "@/components/add-dialog";
 import { db } from "@/firebase";
 import { collection, getDocs, query, Timestamp, where } from "firebase/firestore";
+import { DatePicker } from "./stats/date-picker";
+import useAuthState from "@/hooks/use-auth";
 
 export default function Home() {
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [date, setDate] = useState<Date>(new Date());
+  const { loading } = useAuthState();
 
   useEffect(() => {
     const getBudgetItems = async () => {
@@ -55,6 +58,10 @@ export default function Home() {
     getBudgetItems();
   }, [date])
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -72,16 +79,21 @@ export default function Home() {
             </Breadcrumb>
           </div>
         </header>
-        <main className="p-0 lg:p-16 lg:pt-4">
-          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-center lg:text-left">
+        <main className="p-0 md:p-16 md:pt-4">
+          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-center md:text-left">
             Budget List
           </h2>
-          <div className="flex flex-col items-center lg:items-start lg:flex-row gap-4">
-            <div className="flex-grow flex flex-col">
-              <div className="self-center lg:self-end pb-2">
+          <div className="flex flex-col items-center md:items-start md:flex-row gap-4">
+            <div className="flex-grow flex flex-col w-full px-12 md:px-0">
+              <div className="self-center md:self-end pb-2 gap-4 flex justify-center flex-col md:flex-row">
+                <div className="lg:hidden">
+                  <DatePicker date={date} setDate={setDate} />
+                </div>  
                 <AddDialog items={budgetItems} setItems={setBudgetItems} />
               </div>
-              <BudgetTable items={budgetItems} />
+              <div className="w-full">
+                <BudgetTable items={budgetItems} />
+              </div>
             </div>
             <Card className="w-fit">
               <Calendar
@@ -90,6 +102,7 @@ export default function Home() {
                 onSelect={(day) => day && setDate(day)}
                 toDate={new Date()} // Disables future dates from current date
                 initialFocus
+                className="hidden lg:block"
               />
             </Card>
           </div>
