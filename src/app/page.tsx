@@ -26,7 +26,7 @@ import useAuthState from "@/hooks/use-auth";
 export default function Home() {
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [date, setDate] = useState<Date>(new Date());
-  const { loading } = useAuthState();
+  const { user, loading } = useAuthState();
 
   useEffect(() => {
     const getBudgetItems = async () => {
@@ -35,9 +35,16 @@ export default function Home() {
 
       startOfDay.setHours(0, 0, 0, 0);
       endOfDay.setHours(23, 59, 59, 999);
+      
+      // If user is not logged in, don't load any data
+      if (!user) {
+        return;
+      }
+
+      const userId = user.uid;
 
       const q = query(
-        collection(db, "spending"),
+        collection(db, `users/${userId}/spending`),
         where("date", ">=", startOfDay),
         where("date", "<=", endOfDay)
       );
@@ -56,7 +63,7 @@ export default function Home() {
       });
     };
     getBudgetItems();
-  }, [date])
+  }, [date, user]);
 
   if (loading) {
     return null;
