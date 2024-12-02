@@ -23,6 +23,7 @@ import { collection, getDocs, query, Timestamp, where } from "firebase/firestore
 import { DatePicker } from "./stats/date-picker";
 import useAuthState from "@/hooks/use-auth";
 import { useItems } from "@/context/items-context";
+import NotSignedInAlert from "@/components/not-signed-in-alert";
 
 export default function Home() {
   const {items} = useItems();
@@ -97,10 +98,11 @@ export default function Home() {
           </div>
         </header>
         <main className="p-0 md:p-16 md:pt-4">
-          <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 text-center md:text-left">
+          <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0 text-center md:text-left">
             Budget List
           </h2>
-          <div className="flex flex-col items-center md:items-start md:flex-row gap-4">
+          {!user && <NotSignedInAlert />}
+          <div className="flex flex-col items-center md:items-start md:flex-row gap-4 pt-4">
             <div className="flex-grow flex flex-col w-full px-12 md:px-0">
               <div className="self-center md:self-end pb-2 gap-4 flex justify-center flex-col md:flex-row">
                 <div className="lg:hidden">
