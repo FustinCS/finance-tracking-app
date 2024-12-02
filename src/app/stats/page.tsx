@@ -65,7 +65,7 @@ export default function Home() {
     };
 
     getSpendingData();
-  }, [startDate, endDate]);
+  }, [user, startDate, endDate]);
 
   if (loading) {
     return null;
