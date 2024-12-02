@@ -1,12 +1,7 @@
 "use client";
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
   CircleUser,
 } from "lucide-react";
 
@@ -16,8 +11,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -26,23 +19,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "./ui/button";
 import { ToggleTheme } from "./ui/toggle-theme";
 
 import {
-  getAuth,
   GoogleAuthProvider,
-  onAuthStateChanged,
   signInWithPopup,
-  User,
 } from "firebase/auth";
-import { useEffect, useState } from "react";
 import { auth } from "@/firebase";
 import useAuthState from "@/hooks/use-auth";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user, loading } = useAuthState();
+  const { user } = useAuthState();
 
   const handleSignIn = () => {
     signInWithPopup(auth, new GoogleAuthProvider());
@@ -74,10 +62,7 @@ export function NavUser() {
               ) : (
                 <>
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src="Unknown" alt="No User" className="rounded-full"/>
-                    <AvatarFallback className="rounded-full">
                       <CircleUser className="size-7" />
-                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">Sign in</span>
