@@ -80,7 +80,7 @@ export function NavUser() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">Log in</span>
+                    <span className="truncate font-semibold">Sign in</span>
                   </div>
                 </>
               )}

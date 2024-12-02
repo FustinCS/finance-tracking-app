@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   ChartColumn,
+  House,
   ThumbsUp
 } from "lucide-react"
 
@@ -20,6 +21,12 @@ import NavHeader from "./nav-header"
 // This is sample data.
 const data = {
   navMain: [
+    {
+      title: "Home",
+      url: "/",
+      icon: House,
+      isActive: false,
+    },
     {
       title: "Statistics",
       url: "/stats",
