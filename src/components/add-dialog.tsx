@@ -1,4 +1,4 @@
-import { Copy, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,35 +15,69 @@ import { Input } from "@/components/ui/input";
 import { Label } from "./ui/label";
 import { BudgetItem } from "@/types/budget-item";
 import { useState } from "react";
+import useAuthState from "@/hooks/use-auth";
+import { useItems } from "@/context/items-context";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { generateUniqueId } from "@/lib/utils";
+
 
 interface AddDialogProps {
-  items: BudgetItem[];
-  setItems: React.Dispatch<React.SetStateAction<BudgetItem[]>>;
+  budgetItems: BudgetItem[];
+  setBudgetItems: React.Dispatch<React.SetStateAction<BudgetItem[]>>;
+  currentDate: Date;
 }
 
-export function AddDialog({ items, setItems }: AddDialogProps) {
+export function AddDialog({ budgetItems, setBudgetItems, currentDate}: AddDialogProps) {
+  const { user, loading } = useAuthState();
+  const { items, setItems } = useItems();
+
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!name || !category || !amount) {
       return;
     }
-
-    setItems([
-      ...items,
-      {
-        name: name,
-        category: category,
-        amount: parseFloat(amount)
-      },
-    ]);
-
+  
+    const newItem = {
+      name: name,
+      category: category,
+      amount: parseFloat(amount),
+      date: currentDate,
+    };
+  
+    if (!user) {
+      // Update the local context/state directly for unauthenticated users
+      const uniqueId = generateUniqueId();
+      const itemWithId = { ...newItem, id: uniqueId };
+  
+      setBudgetItems([...budgetItems, itemWithId]);
+      setItems([...items, itemWithId]);
+    } else {
+      try {
+        // Create a new document with an auto-generated ID
+        const userId = user.uid;
+        const docRef = doc(collection(db, `users/${userId}/spending`));
+        await setDoc(docRef, newItem);
+  
+        // Use the generated ID to update the local state
+        const itemWithId = { ...newItem, id: docRef.id };
+  
+        setBudgetItems([...budgetItems, itemWithId]);
+        setItems([...items, itemWithId]);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    }
+  
+    // Clear inputs
     setName("");
     setCategory("");
     setAmount("");
-  }
+  };
+  
 
   return (
     <Dialog>
@@ -96,7 +130,9 @@ export function AddDialog({ items, setItems }: AddDialogProps) {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" onClick={handleAdd}>Add</Button>
+            <Button type="button" onClick={handleAdd}>
+              Add
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

@@ -22,10 +22,14 @@ import { db } from "@/firebase";
 import { collection, getDocs, query, Timestamp, where } from "firebase/firestore";
 import { DatePicker } from "./stats/date-picker";
 import useAuthState from "@/hooks/use-auth";
+import { useItems } from "@/context/items-context";
 
 export default function Home() {
+  const {items} = useItems();
+  
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [date, setDate] = useState<Date>(new Date());
+
   const { user, loading } = useAuthState();
 
   useEffect(() => {
@@ -36,11 +40,16 @@ export default function Home() {
       startOfDay.setHours(0, 0, 0, 0);
       endOfDay.setHours(23, 59, 59, 999);
       
-      // If user is not logged in, don't load any data
+      // If user is not logged in, we are going to opt into using the items context
       if (!user) {
+        const data = items.filter((item) => {
+          return item.date >= startOfDay && item.date <= endOfDay;
+        })
+        setBudgetItems(data);
         return;
       }
-
+      
+      // pull from database if logged in
       const userId = user.uid;
 
       const q = query(
@@ -57,6 +66,7 @@ export default function Home() {
             name: data.name,
             category: data.category,
             amount: data.amount,
+            date: data.date.toDate(),
           };
         });
         setBudgetItems(data);
@@ -96,10 +106,10 @@ export default function Home() {
                 <div className="lg:hidden">
                   <DatePicker date={date} setDate={setDate} />
                 </div>  
-                <AddDialog items={budgetItems} setItems={setBudgetItems} />
+                <AddDialog budgetItems={budgetItems} setBudgetItems={setBudgetItems} currentDate={date} />
               </div>
               <div className="w-full">
-                <BudgetTable items={budgetItems} />
+                <BudgetTable budgetItems={budgetItems} setBudgetItems={setBudgetItems} />
               </div>
             </div>
             <Card className="w-fit">

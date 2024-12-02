@@ -18,9 +18,41 @@ import {
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { BudgetItem } from "@/types/budget-item";
 import { Button } from "./ui/button";
+import useAuthState from "@/hooks/use-auth";
+import { useItems } from "@/context/items-context";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 
-export default function BudgetTable({ items }: { items: BudgetItem[] }) {
-  
+interface BudgetTableProps {
+  budgetItems: BudgetItem[];
+  setBudgetItems: React.Dispatch<React.SetStateAction<BudgetItem[]>>;
+}
+
+export default function BudgetTable({
+  budgetItems,
+  setBudgetItems,
+}: BudgetTableProps) {
+  const { user } = useAuthState();
+  const { items, setItems } = useItems();
+
+  const handleDelete = (id: string) => {
+    // optimistally delete item from budgetItems
+    const updatedBudgetItems = budgetItems.filter((item) => item.id !== id);
+    setBudgetItems(updatedBudgetItems);
+
+    // if user is not logged in, delete from items context
+    if (!user) {
+      const updatedItems = items.filter((item) => item.id !== id);
+      setItems(updatedItems);
+      return;
+    }
+
+    // delete from database
+    const userId = user.uid;
+    const itemRef = doc(db, `users/${userId}/spending/${id}`);
+    deleteDoc(itemRef);
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -32,7 +64,7 @@ export default function BudgetTable({ items }: { items: BudgetItem[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item, index) => {
+        {budgetItems.map((item, index) => {
           return (
             <TableRow key={index}>
               <TableCell className="font-medium">{item.name}</TableCell>
@@ -49,11 +81,7 @@ export default function BudgetTable({ items }: { items: BudgetItem[] }) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Pencil />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer text-red-500 data-[highlighted]:text-red-700 dark:data-[highlighted]:text-red-300 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-[#8B0000]">
+                    <DropdownMenuItem onClick={() => handleDelete(item.id)} className="cursor-pointer text-red-500 data-[highlighted]:text-red-700 dark:data-[highlighted]:text-red-300 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-[#8B0000]">
                       <Trash />
                       Delete
                     </DropdownMenuItem>
