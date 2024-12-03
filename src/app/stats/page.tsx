@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import useAuthState from "@/hooks/use-auth";
 import SignInCard from "@/components/sign-in-card";
-import { Sign } from "crypto";
+import Loading from "@/components/loading";
+import DotLoading from "@/components/dot-loading";
 
 interface SpendingData {
   category: string;
@@ -32,23 +33,26 @@ interface SpendingData {
 export default function Home() {
   const { user, loading } = useAuthState();
   const [spendingData, setSpendingData] = useState<SpendingData[]>([]);
+  const [fetchedData, setFetchedData] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date>(new Date(new Date()));
   const [endDate, setEndDate] = useState<Date>(new Date(new Date()));
 
   useEffect(() => {
     const getSpendingData = async () => {
+      const startOfDay = new Date(startDate);
+      startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(endDate);
       endOfDay.setHours(23, 59, 59, 999);
-      
+
       if (!user) {
         return;
       }
-      
+
       const userId = user.uid;
 
       const q = query(
         collection(db, `users/${userId}/spending`),
-        where("date", ">=", startDate),
+        where("date", ">=", startOfDay),
         where("date", "<=", endOfDay)
       );
       await getDocs(q).then((querySnapshot) => {
@@ -61,14 +65,15 @@ export default function Home() {
           };
         });
         setSpendingData(data);
+        console.log(startDate, endDate, data);
+        setFetchedData(true);
       });
     };
-
     getSpendingData();
   }, [user, startDate, endDate]);
 
   if (loading) {
-    return null;
+    return <Loading />;
   }
 
   return (
@@ -101,12 +106,28 @@ export default function Home() {
               <DatePicker date={endDate} setDate={setEndDate} />
             </div>
 
-            <div className="mb-8">
-              <SpendingChart spendingData={spendingData} />
-            </div>
-            <div>
-              <SpendingTable spendingData={spendingData} />
-            </div>
+            {fetchedData ? (
+              spendingData.length !== 0 ? ( // spending data found
+                <>
+                  <div className="mb-8">
+                    <SpendingChart spendingData={spendingData} />
+                  </div>
+                  <div>
+                    <SpendingTable spendingData={spendingData} />
+                  </div>
+                </>
+              ) : (
+                // no spending data found
+                <div className="flex items-center justify-center w-full h-full">
+                  No data found for the selected date range...
+                </div>
+              )
+            ) : (
+              // spending data is still being fetched
+              <div className="flex items-center justify-center w-full h-full">
+                <DotLoading />
+              </div>
+            )}
           </div>
         )}
       </SidebarInset>

@@ -81,7 +81,10 @@ export default function BudgetTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => handleDelete(item.id)} className="cursor-pointer text-red-500 data-[highlighted]:text-red-700 dark:data-[highlighted]:text-red-300 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-[#8B0000]">
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(item.id)}
+                      className="cursor-pointer text-red-500 data-[highlighted]:text-red-700 dark:data-[highlighted]:text-red-300 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-[#8B0000]"
+                    >
                       <Trash />
                       Delete
                     </DropdownMenuItem>
