@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { db } from "@/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 
 import { DatePicker } from "./date-picker";
 import { SpendingChart } from "./spending-chart";
@@ -53,7 +53,8 @@ export default function Home() {
       const q = query(
         collection(db, `users/${userId}/spending`),
         where("date", ">=", startOfDay),
-        where("date", "<=", endOfDay)
+        where("date", "<=", endOfDay),
+        orderBy("category", "asc")
       );
       await getDocs(q).then((querySnapshot) => {
         const data = querySnapshot.docs.map((doc) => {
@@ -65,7 +66,6 @@ export default function Home() {
           };
         });
         setSpendingData(data);
-        console.log(startDate, endDate, data);
         setFetchedData(true);
       });
     };
@@ -93,43 +93,54 @@ export default function Home() {
             </Breadcrumb>
           </div>
         </header>
-        {!user ? (
-          <div className="p-8 flex justify-center items-center">
-            <SignInCard />
-          </div>
-        ) : (
-          <div className="p-8">
-            <p className="text-2xl">Statistics</p>
-            <div className="flex flex-row gap-x-4 items-center justify-end mb-8">
-              <DatePicker date={startDate} setDate={setStartDate} />
-              <p>-</p>
-              <DatePicker date={endDate} setDate={setEndDate} />
+        <div className="w-screen md:w-10/12 lg:w-full">
+          {!user ? ( // prompt user to sign if they are not
+            <div className="p-8 flex justify-center items-center">
+              <SignInCard />
             </div>
-
-            {fetchedData ? (
-              spendingData.length !== 0 ? ( // spending data found
-                <>
-                  <div className="mb-8">
-                    <SpendingChart spendingData={spendingData} />
-                  </div>
-                  <div>
-                    <SpendingTable spendingData={spendingData} />
-                  </div>
-                </>
-              ) : (
-                // no spending data found
-                <div className="flex items-center justify-center w-full h-full">
-                  No data found for the selected date range...
-                </div>
-              )
-            ) : (
-              // spending data is still being fetched
-              <div className="flex items-center justify-center w-full h-full">
-                <DotLoading />
+          ) : (
+            // user is signed in
+            <div className="px-8 pb-8 md:pt-4">
+              <p className="text-3xl mb-4 text-center md:text-left">
+                Statistics
+              </p>
+              <div className="flex flex-col xs:flex-row gap-x-4 items-center justify-center md:justify-end mb-8">
+                <DatePicker date={startDate} setDate={setStartDate} />
+                <p>-</p>
+                <DatePicker date={endDate} setDate={setEndDate} />
               </div>
-            )}
-          </div>
-        )}
+
+              {fetchedData ? (
+                spendingData.length !== 0 ? ( // spending data found
+                  <>
+                    <div className="mb-8">
+                      {/* bar chart of spending by category  */}
+                      <SpendingChart spendingData={spendingData} />
+                    </div>
+                    <div className="">
+                      {/* table listing spending amounts by category */}
+                      <SpendingTable
+                        spendingData={spendingData.toSorted(
+                          (a, b) => b.amount - a.amount
+                        )}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  // no spending data found
+                  <div className="flex items-center justify-center w-full h-full">
+                    No data found for the selected date range...
+                  </div>
+                )
+              ) : (
+                // spending data is still being fetched
+                <div className="flex items-center justify-center w-full h-full">
+                  <DotLoading />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
