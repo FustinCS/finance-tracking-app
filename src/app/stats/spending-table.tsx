@@ -27,8 +27,8 @@ export function SpendingTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {spendingData.map((spending) => (
-          <TableRow key={spending.category}>
+        {spendingData.map((spending, idx) => (
+          <TableRow key={idx}>
             <TableCell>{spending.category}</TableCell>
             <TableCell className="text-right">{spending.amount}</TableCell>
           </TableRow>

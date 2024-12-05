@@ -65,7 +65,19 @@ export default function Home() {
             amount: data.amount,
           };
         });
-        setSpendingData(data);
+        const groupedData = Object.values(
+          data.reduce(
+            (acc, { category, amount }) => ({
+              ...acc,
+              [category]: {
+                category,
+                amount: (acc[category]?.amount || 0) + amount,
+              },
+            }),
+            {} as Record<string, SpendingData>
+          )
+        );
+        setSpendingData(groupedData);
         setFetchedData(true);
       });
     };
