@@ -1,7 +1,13 @@
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { auth } from "@/firebase";
 
 export default function SignInCard() {
+  const handleSignIn = () => {
+    signInWithPopup(auth, new GoogleAuthProvider());
+  };
+
   return (
     <Card>
         <CardHeader>
@@ -9,7 +15,7 @@ export default function SignInCard() {
             <CardDescription>Sign in to your account to access this page.</CardDescription>
         </CardHeader>
         <CardFooter>
-            <Button className="w-full">Sign In</Button>
+            <Button className="w-full" onClick={handleSignIn}>Sign In</Button>
         </CardFooter>
     </Card>
   );
