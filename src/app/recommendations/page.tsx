@@ -88,11 +88,12 @@ export default function Home() {
                 Generate Recommendations
               </button>
 
-            {fetchedData ? (
-              <RecTable items={spendingData} />
-            ) : (
-              <p>No recommendations yet. Click the button to generate!</p>
-            )}
+              {fetchedData ? (
+                <RecTable items={spendingData} />
+              ) : (
+                <p>No recommendations yet. Click the button to generate!</p>
+              )}
+            </div>
           </div>
         )}
       </SidebarInset>
