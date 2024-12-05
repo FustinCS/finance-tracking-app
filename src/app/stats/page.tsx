@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { db } from "@/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 
 import { DatePicker } from "./date-picker";
 import { SpendingChart } from "./spending-chart";
@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import useAuthState from "@/hooks/use-auth";
 import SignInCard from "@/components/sign-in-card";
-import { Sign } from "crypto";
+import Loading from "@/components/loading";
+import DotLoading from "@/components/dot-loading";
 
 interface SpendingData {
   category: string;
@@ -32,24 +33,28 @@ interface SpendingData {
 export default function Home() {
   const { user, loading } = useAuthState();
   const [spendingData, setSpendingData] = useState<SpendingData[]>([]);
+  const [fetchedData, setFetchedData] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date>(new Date(new Date()));
   const [endDate, setEndDate] = useState<Date>(new Date(new Date()));
 
   useEffect(() => {
     const getSpendingData = async () => {
+      const startOfDay = new Date(startDate);
+      startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(endDate);
       endOfDay.setHours(23, 59, 59, 999);
-      
+
       if (!user) {
         return;
       }
-      
+
       const userId = user.uid;
 
       const q = query(
         collection(db, `users/${userId}/spending`),
-        where("date", ">=", startDate),
-        where("date", "<=", endOfDay)
+        where("date", ">=", startOfDay),
+        where("date", "<=", endOfDay),
+        orderBy("category", "asc")
       );
       await getDocs(q).then((querySnapshot) => {
         const data = querySnapshot.docs.map((doc) => {
@@ -61,14 +66,14 @@ export default function Home() {
           };
         });
         setSpendingData(data);
+        setFetchedData(true);
       });
     };
-
     getSpendingData();
   }, [user, startDate, endDate]);
 
   if (loading) {
-    return null;
+    return <Loading />;
   }
 
   return (
@@ -88,27 +93,54 @@ export default function Home() {
             </Breadcrumb>
           </div>
         </header>
-        {!user ? (
-          <div className="p-8 flex justify-center items-center">
-            <SignInCard />
-          </div>
-        ) : (
-          <div className="p-8">
-            <p className="text-2xl">Statistics</p>
-            <div className="flex flex-row gap-x-4 items-center justify-end mb-8">
-              <DatePicker date={startDate} setDate={setStartDate} />
-              <p>-</p>
-              <DatePicker date={endDate} setDate={setEndDate} />
+        <div className="w-screen md:w-10/12 lg:w-full">
+          {!user ? ( // prompt user to sign if they are not
+            <div className="p-8 flex justify-center items-center">
+              <SignInCard />
             </div>
+          ) : (
+            // user is signed in
+            <div className="px-8 pb-8 md:pt-4">
+              <p className="text-3xl mb-4 text-center md:text-left">
+                Statistics
+              </p>
+              <div className="flex flex-col xs:flex-row gap-x-4 items-center justify-center md:justify-end mb-8">
+                <DatePicker date={startDate} setDate={setStartDate} />
+                <p>-</p>
+                <DatePicker date={endDate} setDate={setEndDate} />
+              </div>
 
-            <div className="mb-8">
-              <SpendingChart spendingData={spendingData} />
+              {fetchedData ? (
+                spendingData.length !== 0 ? ( // spending data found
+                  <>
+                    <div className="mb-8">
+                      {/* bar chart of spending by category  */}
+                      <SpendingChart spendingData={spendingData} />
+                    </div>
+                    <div className="">
+                      {/* table listing spending amounts by category */}
+                      <SpendingTable
+                        spendingData={spendingData.toSorted(
+                          (a, b) => b.amount - a.amount
+                        )}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  // no spending data found
+                  <div className="flex items-center justify-center w-full h-full">
+                    No data found for the selected date range...
+                  </div>
+                )
+              ) : (
+                // spending data is still being fetched
+                <div className="flex items-center justify-center w-full h-full">
+                  <DotLoading />
+                </div>
+              )}
             </div>
-            <div>
-              <SpendingTable spendingData={spendingData} />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -27,7 +27,7 @@ export function SpendingChart({
   return (
     <ChartContainer
       config={chartConfig}
-      className="h-80 flex place-self-center"
+      className="h-80 flex place-self-center w-11/12 md:w-full"
     >
       <BarChart accessibilityLayer data={spendingData}>
         <CartesianGrid vertical={false} />
