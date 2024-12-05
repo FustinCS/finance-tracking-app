@@ -89,7 +89,14 @@ export default function Home() {
               </button>
 
               {fetchedData ? (
-                <RecTable items={spendingData} />
+                spendingData.length !== 0 ? (
+                  <RecTable items={spendingData} />
+                ) : (
+                  <p>
+                    No data available. Add some spending data to get
+                    recommendations!
+                  </p>
+                )
               ) : (
                 <p>No recommendations yet. Click the button to generate!</p>
               )}
