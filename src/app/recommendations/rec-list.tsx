@@ -10,10 +10,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BudgetItem } from "@/types/budget-item";
 import { ClipLoader } from "react-spinners";
 
-export function RecTable({ items }: { items: BudgetItem[] }) {
+interface SpendingData {
+  title: string;
+  category: string;
+  amount: number;
+}
+
+export function RecTable({ items }: { items: SpendingData[] }) {
   const [recommendations, setRecommendations] = useState<string[] | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +29,7 @@ export function RecTable({ items }: { items: BudgetItem[] }) {
 
       try {
         const budgetSummary = items
-          .map((item) => `${item.category}: $${item.amount}`)
+          .map((item) => `${item.title}: $${item.amount}`)
           .join(", ");
 
         const response = await fetch("/api/recommendations", {
@@ -62,10 +67,15 @@ export function RecTable({ items }: { items: BudgetItem[] }) {
         <p>No recommendations yet. Click the button to generate!</p>
       ) : (
         <Table>
-          <TableCaption>A list of AI recommendations on how to save money.</TableCaption>
+          <TableCaption>
+            A list of AI recommendations on how to save money.
+          </TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Possible ways to save money (some may not be possible based on your specific situations)</TableHead>
+              <TableHead className="w-[100px]">
+                Possible ways to save money (some may not be possible based on
+                your specific situations)
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

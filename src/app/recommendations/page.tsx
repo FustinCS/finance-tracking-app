@@ -14,35 +14,46 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { BudgetItem } from "@/types/budget-item";
 import { RecTable } from "./rec-list";
+import { db } from "@/firebase";
+import { collection, getDocs, query } from "firebase/firestore";
+import useAuthState from "@/hooks/use-auth";
 
-const dummyData: BudgetItem[] = [
-  {
-    title: "Groceries",
-    amount: 100,
-    category: "Food",
-  },
-  {
-    title: "Gas",
-    amount: 50,
-    category: "Transportation",
-  },
-  {
-    title: "Rent",
-    amount: 1000,
-    category: "Housing",
-  },
-];
+interface SpendingData {
+  title: string;
+  category: string;
+  amount: number;
+}
 
 export default function Home() {
-  const [shouldFetch, setShouldFetch] = useState(false);
+  const { user } = useAuthState();
+  const [fetchedData, setFetchedData] = useState(false);
+  const [spendingData, setSpendingData] = useState<SpendingData[]>([]);
 
   const handleGenerateRecommendations = () => {
-    setShouldFetch(false);
-    setTimeout(() => {
-      setShouldFetch(true);
-    }, 0);
+    const getSpendingData = async () => {
+      if (!user) {
+        return;
+      }
+
+      const userId = user.uid;
+
+      const q = query(collection(db, `users/${userId}/spending`));
+      await getDocs(q).then((querySnapshot) => {
+        const data = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            title: data.name,
+            category: data.category,
+            amount: data.amount,
+          };
+        });
+        setSpendingData(data);
+        setFetchedData(true);
+      });
+    };
+
+    getSpendingData();
   };
 
   return (
@@ -71,8 +82,8 @@ export default function Home() {
               Generate Recommendations
             </button>
 
-            {shouldFetch ? (
-              <RecTable items={dummyData} />
+            {fetchedData ? (
+              <RecTable items={spendingData} />
             ) : (
               <p>No recommendations yet. Click the button to generate!</p>
             )}
