@@ -15,13 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { MoreHorizontal, Trash } from "lucide-react";
 import { BudgetItem } from "@/types/budget-item";
 import { Button } from "./ui/button";
 import useAuthState from "@/hooks/use-auth";
 import { useItems } from "@/context/items-context";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/firebase";
+import { trimString } from "@/lib/utils";
 
 interface BudgetTableProps {
   budgetItems: BudgetItem[];
@@ -57,7 +58,7 @@ export default function BudgetTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Item</TableHead>
+          <TableHead className="w-[160px]">Item</TableHead>
           <TableHead>Category</TableHead>
           <TableHead className="text-right">Amount</TableHead>
           <TableHead className="w-[16px]" />
@@ -67,8 +68,8 @@ export default function BudgetTable({
         {budgetItems.map((item, index) => {
           return (
             <TableRow key={index}>
-              <TableCell className="font-medium">{item.name}</TableCell>
-              <TableCell>{item.category}</TableCell>
+              <TableCell className="font-medium">{trimString(item.name, 18)}</TableCell>
+              <TableCell>{trimString(item.category, 25)}</TableCell>
               <TableCell className="text-right">
                 ${item.amount.toFixed(2)}
               </TableCell>

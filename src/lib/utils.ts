@@ -10,3 +10,11 @@ export function generateUniqueId(){
   const randomness = Math.random().toString(36).substr(2);
   return dateString + randomness;
 };
+
+export function trimString(str: string, maxLength: number) {
+  if (str.length <= maxLength) {
+    return str;
+  } else {
+    return str.substring(0, maxLength) + "..."; 
+  }
+}
