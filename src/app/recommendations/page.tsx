@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/sidebar";
 import { BudgetItem } from "@/types/budget-item";
 import { RecTable } from "./rec-list";
+import useAuthState from "@/hooks/use-auth";
+import SignInCard from "@/components/sign-in-card";
 
 const dummyData: BudgetItem[] = [
   {
@@ -36,6 +38,7 @@ const dummyData: BudgetItem[] = [
 ];
 
 export default function Home() {
+  const { user } = useAuthState();
   const [shouldFetch, setShouldFetch] = useState(false);
 
   const handleGenerateRecommendations = () => {
@@ -62,22 +65,28 @@ export default function Home() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
-          <div className="w-full">
-            <button
-              onClick={handleGenerateRecommendations}
-              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Generate Recommendations
-            </button>
-
-            {shouldFetch ? (
-              <RecTable items={dummyData} />
-            ) : (
-              <p>No recommendations yet. Click the button to generate!</p>
-            )}
+        {!user ? (
+          <div className="p-8 flex justify-center items-center">
+            <SignInCard />
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
+            <div className="w-full">
+              <button
+                onClick={handleGenerateRecommendations}
+                className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Generate Recommendations
+              </button>
+
+              {shouldFetch ? (
+                <RecTable items={dummyData} />
+              ) : (
+                <p>No recommendations yet. Click the button to generate!</p>
+              )}
+            </div>
+          </div>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );
