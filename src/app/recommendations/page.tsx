@@ -18,6 +18,7 @@ import { RecTable } from "./rec-list";
 import { db } from "@/firebase";
 import { collection, getDocs, query } from "firebase/firestore";
 import useAuthState from "@/hooks/use-auth";
+import SignInCard from "@/components/sign-in-card";
 
 interface SpendingData {
   title: string;
@@ -73,14 +74,19 @@ export default function Home() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
-          <div className="w-full">
-            <button
-              onClick={handleGenerateRecommendations}
-              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Generate Recommendations
-            </button>
+        {!user ? (
+          <div className="p-8 flex justify-center items-center">
+            <SignInCard />
+          </div>
+        ) : (
+          <div className="flex flex-wrap lg:flex-nowrap flex-1 gap-4 p-16 pt-4">
+            <div className="w-full">
+              <button
+                onClick={handleGenerateRecommendations}
+                className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Generate Recommendations
+              </button>
 
             {fetchedData ? (
               <RecTable items={spendingData} />
@@ -88,7 +94,7 @@ export default function Home() {
               <p>No recommendations yet. Click the button to generate!</p>
             )}
           </div>
-        </div>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );
