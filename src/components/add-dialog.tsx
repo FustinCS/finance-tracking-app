@@ -29,7 +29,7 @@ interface AddDialogProps {
 }
 
 export function AddDialog({ budgetItems, setBudgetItems, currentDate}: AddDialogProps) {
-  const { user, loading } = useAuthState();
+  const { user } = useAuthState();
   const { items, setItems } = useItems();
 
   const [name, setName] = useState("");

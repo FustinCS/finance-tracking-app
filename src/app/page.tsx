@@ -19,7 +19,7 @@ import { BudgetItem } from "@/types/budget-item";
 import { Card } from "@/components/ui/card";
 import { AddDialog } from "@/components/add-dialog";
 import { db } from "@/firebase";
-import { collection, getDocs, query, Timestamp, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { DatePicker } from "./stats/date-picker";
 import useAuthState from "@/hooks/use-auth";
 import { useItems } from "@/context/items-context";
@@ -74,7 +74,7 @@ export default function Home() {
       });
     };
     getBudgetItems();
-  }, [date, user]);
+  }, [items, date, user]);
 
   if (loading) {
     return null;
